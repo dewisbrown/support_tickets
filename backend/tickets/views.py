@@ -3,34 +3,65 @@ Class-based views allow the response to different HTTP request methods
 with different class instance methods, instead of conditionally branching code 
 inside a single view function.
 """
-from rest_framework import generics
+from tickets.models import Ticket
+from tickets.serializers import TicketSerializer, UserSerializer
+from tickets.permissions import IsOwnerOrReadOnly
+from rest_framework import permissions, generics
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework.reverse import reverse
+from django.contrib.auth.models import User
 
-from .models import Ticket
-from .serializers import TicketSerializer
+
+@api_view(['GET'])
+def api_root(request, format=None):
+    return Response({
+        'users': reverse('user-list', request=request, format=format),
+        'tickets': reverse('ticket-list', request=request, format=format)
+    })
 
 
-class TicketListCreateAPIView(generics.ListCreateAPIView):
-    """
-    View for listing a queryset or creating a model instance.
-    """
+class TicketListView(generics.ListCreateAPIView):
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+        IsOwnerOrReadOnly
+    ]
 
     def perform_create(self, serializer):
-        print(serializer.validated_data)
-        author = serializer.validated_data.get('author')
-        pub_date = serializer.validated_data.get('pub_date')
-        content = serializer.validated_data.get('content')
+        serializer.save(owner=self.request.user)
 
-        serializer.save(author=author, pub_date=pub_date, content=content)
 
-ticket_list_create_view = TicketListCreateAPIView.as_view()
-
-class TicketDetailAPIView(generics.RetrieveAPIView):
-    """
-    View for retrieving a model instance.
-    """
+class TicketDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+        IsOwnerOrReadOnly
+    ]
 
-ticket_detail_as_view = TicketDetailAPIView.as_view()
+
+# class TicketsByUserView(generics.ListAPIView):
+#     queryset = Ticket.objects.all()
+#     serializer_class = UserSerializer
+#     permission_classes = [
+#         permissions.IsAdminUser,
+#         IsOwnerOrReadOnly
+#     ]
+
+
+class UserListView(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [
+        permissions.IsAdminUser,
+    ]
+
+
+class UserDetailView(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [
+        permissions.IsAdminUser,
+    ]
