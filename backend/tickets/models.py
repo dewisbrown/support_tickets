@@ -10,10 +10,10 @@ from django.db import models
 
 
 class Ticket(models.Model):
-    """
-    Ticket object represents a customer support ticket.
-    """
-    author = models.CharField(max_length=20)
-    pub_date = models.CharField(max_length=20)
+    owner = models.ForeignKey('auth.User', related_name='tickets', on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
     content = models.TextField(max_length=200)
     resolved = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['created']
