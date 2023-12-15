@@ -5,10 +5,19 @@ Defining urls for tickets endpoints:
 """
 from django.urls import path
 
-from . import views
+from tickets import views
 
-# api/tickets/
+
 urlpatterns = [
-    path('', views.ticket_list_create_view),
-    path('<int:pk>/', views.ticket_detail_as_view),
+    path('', views.api_root),
+    path('tickets/', views.TicketListView.as_view(),
+         name='ticket-list'),
+    path('tickets/<int:pk>/', views.TicketDetailView.as_view(),
+         name='ticket-detail'),
+    path('users/', views.UserListView.as_view(),
+         name='user-list'),
+    path('users/<int:pk>/', views.UserDetailView.as_view(),
+         name='user-detail'),
+    # path('tickets-by-user/<int:pk>/', views.TicketsByUserView.as_view(),
+    #    name='tickets-by-user'),
 ]
