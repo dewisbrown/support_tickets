@@ -9,6 +9,6 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
         # Read permissions are allowed for all requests
         if request.method in permissions.SAFE_METHODS:
             return True
-        
+
         # Write permissions only allowed to owner of ticket
         return obj.owner == request.user

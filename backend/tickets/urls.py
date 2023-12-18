@@ -18,6 +18,6 @@ urlpatterns = [
          name='user-list'),
     path('users/<int:pk>/', views.UserDetailView.as_view(),
          name='user-detail'),
-    # path('tickets-by-user/<int:pk>/', views.TicketsByUserView.as_view(),
-    #    name='tickets-by-user'),
+#     path('tickets-by-user/<int:pk>/', views.TicketsByUserView.as_view(),
+#        name='tickets-by-user'),
 ]
