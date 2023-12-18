@@ -50,18 +50,17 @@ class TicketDetailView(generics.RetrieveUpdateDestroyAPIView):
 #         IsOwnerOrReadOnly
 #     ]
 
-
-class UserListView(generics.ListAPIView):
+class UserListView(generics.ListCreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [
-        permissions.IsAdminUser,
+        permissions.AllowAny,
     ]
 
 
 class UserDetailView(generics.RetrieveAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [
-        permissions.IsAdminUser,
-    ]
+    # permission_classes = [
+    #     permissions.IsAdminUser,
+    # ]
