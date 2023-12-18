@@ -31,6 +31,24 @@ class TicketListView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
+    def get_queryset(self):
+        """
+        Allows filtering tickets, returns all tickets if no params.
+        """
+        # Filter by resolved attribute
+        resolved = self.request.query_params.get('resolved', None)
+        if resolved:
+            qs = Ticket.objects.filter(resolved=resolved)
+            return qs
+
+        # Filter by user_id
+        user_id = self.request.query_params.get('user_id', None)
+        if user_id:
+            qs = Ticket.objects.filter(owner=user_id)
+            return qs
+
+        return super().get_queryset()
+
 
 class TicketDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Ticket.objects.all()
