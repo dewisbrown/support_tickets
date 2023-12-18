@@ -17,7 +17,7 @@ from django.contrib.auth.models import User
 def api_root(request, format=None):
     return Response({
         'users': reverse('user-list', request=request, format=format),
-        'tickets': reverse('ticket-list', request=request, format=format)
+        'tickets': reverse('ticket-list', request=request, format=format),
     })
 
 
@@ -26,7 +26,6 @@ class TicketListView(generics.ListCreateAPIView):
     serializer_class = TicketSerializer
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
-        IsOwnerOrReadOnly
     ]
 
     def perform_create(self, serializer):
@@ -51,6 +50,10 @@ class TicketDetailView(generics.RetrieveUpdateDestroyAPIView):
 #     ]
 
 class UserListView(generics.ListCreateAPIView):
+    """
+    User view to handle 'GET' request for collection of users,
+    and 'POST' requests for creating a new user.
+    """
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [
@@ -58,9 +61,14 @@ class UserListView(generics.ListCreateAPIView):
     ]
 
 
-class UserDetailView(generics.RetrieveAPIView):
+class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    User view to handle 'GET' requests for a single user instance,
+    'PUT' requests to update User info, and
+    'DELETE' requests to delete a user.
+    """
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    # permission_classes = [
-    #     permissions.IsAdminUser,
-    # ]
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+    ]
