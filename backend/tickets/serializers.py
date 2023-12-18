@@ -21,7 +21,9 @@ class TicketSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
-    tickets = serializers.HyperlinkedRelatedField(many=True, view_name='ticket-detail', read_only=True)
+    tickets = serializers.HyperlinkedRelatedField(many=True,
+                                                  view_name='ticket-detail',
+                                                  read_only=True)
 
     class Meta:
         model = User
@@ -29,5 +31,17 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
             'url',
             'id',
             'username',
+            'password',
+            'email',
             'tickets',
+            'is_staff',
         ]
+
+    def create(self, validated_data):
+        """
+        Overrides parent 'create' function.
+        """
+        user = super(UserSerializer, self).create(validated_data=validated_data)
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
