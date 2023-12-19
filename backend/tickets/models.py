@@ -1,7 +1,7 @@
 """
 Database model for a Ticket object.
 Attributes:
-    - author: user that submitted ticket
+    - owner: user that submitted ticket
     - pub_date: date ticket was created
     - content: info about ticket
     - resolved: boolean that staff can set when ticket is resolved
