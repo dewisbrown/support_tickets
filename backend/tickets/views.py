@@ -5,7 +5,7 @@ inside a single view function.
 """
 from tickets.models import Ticket
 from tickets.serializers import TicketSerializer, UserSerializer
-from tickets.permissions import IsOwnerOrReadOnly
+from tickets.permissions import IsOwnerOrReadOnly, IsStaffEditorPermission
 from rest_framework import permissions, generics
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -25,7 +25,7 @@ class TicketListView(generics.ListCreateAPIView):
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
     permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly,
+        IsStaffEditorPermission,
     ]
 
     def perform_create(self, serializer):
