@@ -6,7 +6,7 @@ inside a single view function.
 from tickets.models import Ticket
 from tickets.serializers import TicketSerializer, UserSerializer
 from tickets.permissions import IsOwnerOrReadOnly, IsStaffEditorPermission
-from rest_framework import permissions, generics
+from rest_framework import permissions, generics, authentication
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
@@ -24,7 +24,11 @@ def api_root(request, format=None):
 class TicketListView(generics.ListCreateAPIView):
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
+    authentication_classes = [
+        authentication.SessionAuthentication,
+    ]
     permission_classes = [
+        permissions.IsAdminUser,
         IsStaffEditorPermission,
     ]
 
