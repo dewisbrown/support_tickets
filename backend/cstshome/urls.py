@@ -11,4 +11,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('tickets.urls')),
     path('api/auth/', obtain_auth_token),
+    path('api/v2/', include('cstshome.routers')),
 ]
