@@ -5,7 +5,7 @@ inside a single view function.
 """
 from .models import Ticket
 from .serializers import TicketSerializer, UserSerializer
-from .mixins import StaffEditorPermissionMixin, UserQuerySetMixin
+from .mixins import StaffEditorPermissionMixin
 from .permissions import IsOwnerOrReadOnly
 from rest_framework import generics
 from rest_framework.decorators import api_view
@@ -26,13 +26,11 @@ def api_root(request, format=None):
 
 
 class TicketListView(
-    UserQuerySetMixin,
     StaffEditorPermissionMixin,
     generics.ListCreateAPIView):
     """
     API View for creating Ticket or listing all Ticket objects.
     """
-    queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
     permission_classes = [IsOwnerOrReadOnly]
 
@@ -41,6 +39,27 @@ class TicketListView(
         Overriden perform_create to create ticket with an owner.
         """
         serializer.save(owner=self.request.user)
+
+
+    def get_queryset(self, *args, **kwargs):
+        """
+        Overriden to allow filtering by user if user is not staff.
+        """
+        owner_field = 'owner'
+        user = self.request.user
+
+        # anonymous user sees empty list
+        if not user.is_authenticated:
+            return Ticket.objects.none()
+
+        # staff can view all tickets
+        if self.request.user.is_staff:
+            return Ticket.objects.all()
+
+        # filter by user if user is not staff
+        lookup_data = {}
+        lookup_data[owner_field] = self.request.user
+        return Ticket.objects.filter(**lookup_data)
 
 
     # def get_queryset(self, *args, **kwargs):
