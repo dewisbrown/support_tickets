@@ -12,7 +12,3 @@ urlpatterns = [
     path('api/', include('tickets.urls')),
     path('api/auth/', obtain_auth_token),
 ]
-
-urlpatterns += [
-    path('api-auth/', include('rest_framework.urls')),
-]
