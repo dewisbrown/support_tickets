@@ -12,8 +12,8 @@ class TicketSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Ticket
         fields = [
-            'url',
             'id',
+            'url',
             'owner',
             'content',
             'resolved',
@@ -28,8 +28,8 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
         fields = [
-            'url',
             'id',
+            'url',
             'username',
             'password',
             'email',
