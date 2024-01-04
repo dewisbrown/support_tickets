@@ -40,7 +40,7 @@ class TicketListView(
         serializer.save(owner=self.request.user)
 
 
-    def get_queryset(self):
+    def get_queryset(self, *args, **kwargs):
         """
         Allows filtering tickets, returns all tickets if no params.
         """
@@ -56,7 +56,7 @@ class TicketListView(
             qs = Ticket.objects.filter(owner=user_id)
             return qs
 
-        return super().get_queryset()
+        return super().get_queryset(*args, **kwargs)
 
 
 class TicketDetailView(
