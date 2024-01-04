@@ -7,7 +7,7 @@ from .models import Ticket
 from .serializers import TicketSerializer, UserSerializer
 from .mixins import StaffEditorPermissionMixin
 from .permissions import IsOwnerOrReadOnly
-from rest_framework import generics
+from rest_framework import generics, status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
@@ -29,7 +29,9 @@ class TicketListView(
     StaffEditorPermissionMixin,
     generics.ListCreateAPIView):
     """
-    API View for creating Ticket or listing all Ticket objects.
+    API View for creating Ticket or listing all Ticket objects. 
+    Staff, Admin, and Ticket owners have access. Anonymous Users 
+    cannot view data.
     """
     serializer_class = TicketSerializer
     permission_classes = [IsOwnerOrReadOnly]
