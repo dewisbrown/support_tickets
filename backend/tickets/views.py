@@ -3,11 +3,10 @@ Class-based views allow the response to different HTTP request methods
 with different class instance methods, instead of conditionally branching code 
 inside a single view function.
 """
-from cstshome.authentication import TokenAuthentication
-from tickets.models import Ticket
-from tickets.serializers import TicketSerializer, UserSerializer
-from tickets.permissions import IsOwnerOrReadOnly, IsStaffEditorPermission
-from rest_framework import permissions, generics, authentication
+from .models import Ticket
+from .serializers import TicketSerializer, UserSerializer
+from .mixins import StaffEditorPermissionMixin
+from rest_framework import generics
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
@@ -25,19 +24,21 @@ def api_root(request, format=None):
     })
 
 
-class TicketListView(generics.ListCreateAPIView):
+class TicketListView(
+    StaffEditorPermissionMixin,
+    generics.ListCreateAPIView):
+    """
+    API View for creating Ticket or listing all Ticket objects.
+    """
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
-    permission_classes = [
-        permissions.IsAdminUser,
-        IsStaffEditorPermission,
-    ]
 
     def perform_create(self, serializer):
         """
         Overriden perform_create to create ticket with an owner.
         """
         serializer.save(owner=self.request.user)
+
 
     def get_queryset(self):
         """
@@ -58,36 +59,31 @@ class TicketListView(generics.ListCreateAPIView):
         return super().get_queryset()
 
 
-class TicketDetailView(generics.RetrieveUpdateDestroyAPIView):
+class TicketDetailView(
+    StaffEditorPermissionMixin,
+    generics.RetrieveUpdateDestroyAPIView):
+    """
+    API View for retrieving, deleting, or updating 
+    a single Ticket object.
+    """
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
-    permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly,
-        IsOwnerOrReadOnly
-    ]
 
 
-# class TicketsByUserView(generics.ListAPIView):
-#     queryset = Ticket.objects.all()
-#     serializer_class = UserSerializer
-#     permission_classes = [
-#         permissions.IsAdminUser,
-#         IsOwnerOrReadOnly
-#     ]
-
-class UserListView(generics.ListCreateAPIView):
+class UserListView(
+    StaffEditorPermissionMixin,
+    generics.ListCreateAPIView):
     """
     User view to handle 'GET' request for collection of users,
     and 'POST' requests for creating a new user.
     """
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [
-        permissions.AllowAny,
-    ]
 
 
-class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
+class UserDetailView(
+    StaffEditorPermissionMixin,
+    generics.RetrieveUpdateDestroyAPIView):
     """
     User view to handle 'GET' requests for a single user instance,
     'PUT' requests to update User info, and
@@ -95,6 +91,3 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
     """
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly,
-    ]
