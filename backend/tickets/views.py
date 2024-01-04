@@ -3,6 +3,7 @@ Class-based views allow the response to different HTTP request methods
 with different class instance methods, instead of conditionally branching code 
 inside a single view function.
 """
+from cstshome.authentication import TokenAuthentication
 from tickets.models import Ticket
 from tickets.serializers import TicketSerializer, UserSerializer
 from tickets.permissions import IsOwnerOrReadOnly, IsStaffEditorPermission
@@ -15,6 +16,9 @@ from django.contrib.auth.models import User
 
 @api_view(['GET'])
 def api_root(request, format=None):
+    """
+    Function-based view for api home endpoint.
+    """
     return Response({
         'users': reverse('user-list', request=request, format=format),
         'tickets': reverse('ticket-list', request=request, format=format),
@@ -24,15 +28,15 @@ def api_root(request, format=None):
 class TicketListView(generics.ListCreateAPIView):
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
-    authentication_classes = [
-        authentication.SessionAuthentication,
-    ]
     permission_classes = [
         permissions.IsAdminUser,
         IsStaffEditorPermission,
     ]
 
     def perform_create(self, serializer):
+        """
+        Overriden perform_create to create ticket with an owner.
+        """
         serializer.save(owner=self.request.user)
 
     def get_queryset(self):
